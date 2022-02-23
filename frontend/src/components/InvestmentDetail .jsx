@@ -27,7 +27,11 @@ function InvestmentDetail(props) {
         : null
       }
       <BuyAsset assetValuation={selectedBondStockValuation.value} />
-      {hasAsset ? <SellAsset estimatedPrice={20000} /> : null}
+      {hasAsset
+        ? <SellAsset
+          assetValuation={selectedBondStockValuation.value}
+          maxAmount={myInvestmentMatch.amount} />
+        : null}
     </>
   )
 }
