@@ -1,29 +1,40 @@
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import ListGroup from 'react-bootstrap/ListGroup'
 import Card from 'react-bootstrap/Card'
 
-import { SavingTypes } from '../features/dashboard/dashboardService';
+import { selectCurrentInvestment } from '../features/dashboard/dashboardSlice'
+import { InvestingTypes } from '../features/dashboard/dashboardService';
+import SavingsBankType from './SavingsBankType';
+import BondsStockType from './BondsStockType';
 
 export default function MyInvestments() {
-  const { myInvestments } = useSelector(state => state.dashboard)
+  const { myInvestments, selectedBondStockId } = useSelector(state => state.dashboard)
+  const dispatch = useDispatch()
+  const handleOnClick = id => dispatch(selectCurrentInvestment(id))
 
   return (
-    <Card style={{ width: '24rem' }}>
+    <Card style={{ width: '24rem' }} className="mb-3">
       <Card.Header>Mis Inversiones</Card.Header>
       <Card.Body>
         <ListGroup as="ol" variant="flush">
-          {myInvestments.map(s =>
-            <ListGroup.Item as="li" key={s.id}
-              className="d-flex justify-content-between align-items-start">
-              <div>{s.description}</div>
-              {s.type === SavingTypes.SavingBank
-                ? <div>(AR${s.amount})</div>
-                : <div>({s.amount} unidades)</div>
-              }
-            </ListGroup.Item>
+          {myInvestments.map(s => (
+            s.type === InvestingTypes.SavingsBank
+              ? <SavingsBankType
+                key={s.id}
+                id={s.id}
+                description={s.description}
+                amount={s.amount}
+              />
+              : <BondsStockType
+                key={s.id}
+                id={s.id}
+                description={s.description}
+                amount={s.amount}
+                active={s.id === selectedBondStockId}
+                handleOnClick={handleOnClick}
+              />)
           )}
         </ListGroup>
       </Card.Body>
-    </Card>
-  )
+    </Card>)
 }

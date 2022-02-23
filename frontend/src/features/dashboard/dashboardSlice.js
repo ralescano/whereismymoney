@@ -1,7 +1,9 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit'
 import dashboardService from './dashboardService'
 
 const initialState = {
+  selectedBondStockId: null,
+  selectedBondStockValuation: { description: '', value: 0 },
   myInvestments: [],
   otherInvestments: [],
 }
@@ -25,6 +27,17 @@ export const getOtherInvestments = createAsyncThunk(
     }
   }
 )
+export const getCurrentValuation = createAsyncThunk(
+  'dashboard/getCurrentValuation',
+  async (id, thunkAPI) => {
+    try {
+      return await dashboardService.getCurrentValuation(id)
+    } catch (error) {
+      thunkAPI.rejectWithValue(error)
+    }
+  }
+)
+export const selectCurrentInvestment = createAction('dashboard/selectCurrentInvestment');
 
 export const dashboardSlice = createSlice({
   name: 'dashboard',
@@ -40,6 +53,15 @@ export const dashboardSlice = createSlice({
       })
       .addCase(getOtherInvestments.fulfilled, (state, action) => {
         state.otherInvestments = action.payload
+      })
+      .addCase(selectCurrentInvestment, (state, action) => {
+        state.selectedBondStockId = state.selectedBondStockId === action.payload
+          ? null
+          : action.payload
+      })
+      .addCase(getCurrentValuation.fulfilled, (state, action) => {
+        state.selectedBondStockValuation = action.payload;
+        return state;
       })
   }
 })
