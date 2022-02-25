@@ -22,15 +22,15 @@ export default function MyInvestments() {
               ? <SavingsBankType
                 key={s.id}
                 id={s.id}
-                description={s.description}
+                description={s.name}
                 amount={s.amount}
               />
               : <BondsStockType
                 key={s.id}
-                id={s.id}
-                description={s.description}
-                amount={s.amount}
-                active={s.id === selectedBondStockId}
+                assetId={s.assetId}
+                description={s.name}
+                amount={s.assetAmount}
+                active={s.assetId === selectedBondStockId}
                 handleOnClick={handleOnClick}
               />)
           )}

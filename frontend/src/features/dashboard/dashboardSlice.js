@@ -1,9 +1,12 @@
 import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit'
 import dashboardService from './dashboardService'
+import { InvestingTypes } from './dashboardService';
 
 const initialState = {
   selectedBondStockId: null,
-  selectedBondStockValuation: { description: '', value: 0 },
+  isOtherInvestmentSelected: false,
+  selectedAsset: { name: '', amount: 0, value: 0, valuation: 0 },
+  portfolio: { total: 0, assets: [] },
   myInvestments: [],
   otherInvestments: [],
 }
@@ -12,32 +15,41 @@ export const getMyInvestments = createAsyncThunk(
   'dashboard/getMyInvestments',
   async (thunkAPI) => {
     try {
-      return await dashboardService.getMyInvestments()
+      const myInvestments = await dashboardService.getMyInvestments()
+      const allAssets = await dashboardService.getAssets()
+      return {
+        myInvestments,
+        allAssets
+      }
     } catch (error) {
       thunkAPI.rejectWithValue(error)
     }
-  });
-export const getOtherInvestments = createAsyncThunk(
-  'dashboard/getOtherInvestments',
+  })
+
+export const getPortfolio = createAsyncThunk(
+  'dashboard/getPortfolio',
   async (thunkAPI) => {
     try {
-      return await dashboardService.getOtherInvestments()
+      return await dashboardService.getPortfolio()
     } catch (error) {
       thunkAPI.rejectWithValue(error)
     }
   }
 )
-export const getCurrentValuation = createAsyncThunk(
-  'dashboard/getCurrentValuation',
+
+export const getInvestmentById = createAsyncThunk(
+  'dashboard/getInvestmentById',
   async (id, thunkAPI) => {
     try {
-      return await dashboardService.getCurrentValuation(id)
+      return await dashboardService.getInvestmentById(id)
     } catch (error) {
       thunkAPI.rejectWithValue(error)
     }
   }
 )
+
 export const selectCurrentInvestment = createAction('dashboard/selectCurrentInvestment');
+export const selectOtherInvestment = createAction('dashboard/selectOtherInvestment');
 
 export const dashboardSlice = createSlice({
   name: 'dashboard',
@@ -46,22 +58,34 @@ export const dashboardSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getMyInvestments.fulfilled, (state, action) => {
-        state.myInvestments = action.payload
-      })
-      .addCase(getMyInvestments.rejected, (state, action) => {
-        console.log('getMyInvestments.rejected', JSON.stringify(action))
-      })
-      .addCase(getOtherInvestments.fulfilled, (state, action) => {
+        state.myInvestments = action.payload.myInvestments
+        const assetsToExclude = state
+          .myInvestments
+          .filter(x => x.type === InvestingTypes.BondsAndStock)
+          .map(x => x.assetId)
         state.otherInvestments = action.payload
+          .allAssets
+          .filter(x => assetsToExclude.indexOf(x.id) === -1)
       })
       .addCase(selectCurrentInvestment, (state, action) => {
         state.selectedBondStockId = state.selectedBondStockId === action.payload
           ? null
           : action.payload
+        state.isOtherInvestmentSelected = false
       })
-      .addCase(getCurrentValuation.fulfilled, (state, action) => {
-        state.selectedBondStockValuation = action.payload;
-        return state;
+      .addCase(selectOtherInvestment, (state, action) => {
+        state.selectedBondStockId = state.selectedBondStockId === action.payload
+          ? null
+          : action.payload
+        state.isOtherInvestmentSelected = !!state.selectedBondStockId
+      })
+      .addCase(getPortfolio.fulfilled, (state, action) => {
+        state.portfolio = action.payload
+        return state
+      })
+      .addCase(getInvestmentById.fulfilled, (state, action) => {
+        state.selectedAsset = action.payload
+        return state
       })
   }
 })

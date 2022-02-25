@@ -26,7 +26,7 @@ export default function DashboardPage() {
         </Col>
         <Col>
           {selectedBondStockId
-            ? <InvestmentDetail bondStockId={selectedBondStockId} />
+            ? <InvestmentDetail assetId={selectedBondStockId} />
             : <Portfolio />
           }
         </Col>
