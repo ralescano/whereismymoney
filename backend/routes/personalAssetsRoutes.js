@@ -1,6 +1,9 @@
 const express = require('express')
-const { createPersonalAssets } = require('../controllers/personalAssetController')
+const {
+    createPersonalAssetsValidationRules,
+    createPersonalAssets
+} = require('../controllers/personalAssetController')
 
 const router = express.Router()
-router.post('/', createPersonalAssets)
+router.post('/', createPersonalAssetsValidationRules(), createPersonalAssets)
 module.exports = router
