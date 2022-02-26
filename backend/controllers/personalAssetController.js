@@ -1,12 +1,8 @@
 const asyncHandler = require('express-async-handler')
 const { body, validationResult } = require('express-validator')
 const PersonalAsset = require('../models/personalAssets')
+const {ASSET_TYPE} = require('./constants')
 
-
-const ASSET_TYPE = {
-  SavingsBank: 'SavingsBank',
-  BondsAndStock: 'BondsAndStock'
-}
 const createPersonalAssetsValidationRules = () => [
   body('name')
     .exists({ checkNull: true }).withMessage('name is required').bail()

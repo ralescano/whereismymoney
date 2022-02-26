@@ -3,7 +3,7 @@ const { body, param, validationResult } = require('express-validator')
 
 const Asset = require('../models/assetModel')
 const PersonalAsset = require('../models/personalAssets')
-
+const { ASSET_TYPE } = require('./constants')
 
 const getAssets = asyncHandler(async (req, res) => {
   const assets = await Asset.find()
@@ -47,7 +47,7 @@ const getInvestments = asyncHandler(async (req, res) => {
     id: pa.id,
     name: pa.name,
     value: pa.amoount,
-    type: 'SavingsBank',
+    type: ASSET_TYPE.SavingsBank,
   }))
 
   const assetsResult = assets.map(a => {
@@ -56,7 +56,7 @@ const getInvestments = asyncHandler(async (req, res) => {
       id: a.id,
       name: a.name,
       value: latestEntry.price,
-      type: 'BondsAndStock',
+      type: ASSET_TYPE.BondsAndStock,
     })
   })
   res.status(201).json([...pAssetsResult, ...assetsResult])

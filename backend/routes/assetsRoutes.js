@@ -4,7 +4,7 @@ const {
   getAssetByIdValidationRules, getAssetById,
   createAssetValidationRules, createAsset,
   updateAssetValidationRules, updateAsset
-} = require('../controllers/assetControllers')
+} = require('../controllers/assetController')
 
 const router = express.Router()
 
